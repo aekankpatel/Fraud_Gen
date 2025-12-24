@@ -1,7 +1,13 @@
+# Python
 venv/
 __pycache__/
 *.pyc
+
+# Node / React
 node_modules/
+fraudgen-client/build/
+
+# Env & OS
 .env
 .DS_Store
 .Rhistory
