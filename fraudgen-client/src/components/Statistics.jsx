@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from "../api";
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
 
 function Statistics() {
@@ -32,7 +32,7 @@ function Statistics() {
   const fetchStatistics = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5050/api/statistics');
+      const response = await api.get("/api/statistics");
       setStatistics(response.data);
       setLoading(false);
     } catch (err) {
@@ -44,7 +44,7 @@ function Statistics() {
 
   const fetchLocationStats = async () => {
     try {
-      const response = await axios.get('http://localhost:5050/api/statistics/locations');
+      const response = await api.get("/api/statistics/locations");
       setLocationStats({
        country_statistics: response.data.country_stats,
        vpn_proxy_statistics: response.data.vpn_proxy_stats

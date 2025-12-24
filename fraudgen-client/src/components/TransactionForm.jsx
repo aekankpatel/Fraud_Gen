@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from "../api";
 
 function TransactionForm() {
   const [formData, setFormData] = useState({
@@ -19,7 +19,7 @@ function TransactionForm() {
   
   const loadSampleTransaction = () => {
     setLoading(true);
-    axios.get('http://localhost:5050/api/test-transaction')
+    api.get('/api/test-transaction')
       .then(response => {
         // Always use step value 3
         const sampleWithTimeStep = {
@@ -47,7 +47,7 @@ function TransactionForm() {
       step: 3
     };
     
-    axios.post('http://localhost:5050/api/predict', submissionData)
+    api.post('/api/predict', submissionData)
       .then(response => {
         setResult(response.data);
         setLoading(false);

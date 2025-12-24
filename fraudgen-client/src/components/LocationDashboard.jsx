@@ -16,7 +16,7 @@ function LocationDashboard() {
       setLoading(true);
       try {
         // Fetch location statistics
-        const statsResponse = await fetch('http://localhost:5050/api/statistics/locations');
+        const statsResponse = await fetch('/api/statistics/locations');
         if (!statsResponse.ok) {
           throw new Error(`Statistics API returned ${statsResponse.status}`);
         }
@@ -26,7 +26,7 @@ function LocationDashboard() {
         
         // Fetch transactions with location data
         const txQuery = selectedCountry !== 'all' ? `?country=${selectedCountry}&limit=10` : '?limit=10';
-        const txResponse = await fetch(`http://localhost:5050/api/transactions${txQuery}`);
+        const txResponse = await fetch(`/api/transactions${txQuery}`);
         if (!txResponse.ok) {
           throw new Error(`Transactions API returned ${txResponse.status}`);
         }
@@ -74,7 +74,7 @@ function LocationDashboard() {
     setLoading(true);
     try {
       // Fetch location statistics
-      const statsResponse = await fetch('http://localhost:5050/api/statistics/locations');
+      const statsResponse = await fetch('/api/statistics/locations');
       if (!statsResponse.ok) {
         throw new Error(`Statistics API returned ${statsResponse.status}`);
       }
@@ -84,7 +84,7 @@ function LocationDashboard() {
       
       // Fetch transactions with location data
       const txQuery = selectedCountry !== 'all' ? `?country=${selectedCountry}&limit=10` : '?limit=10';
-      const txResponse = await fetch(`http://localhost:5050/api/transactions${txQuery}`);
+      const txResponse = await fetch(`/api/transactions${txQuery}`);
       if (!txResponse.ok) {
         throw new Error(`Transactions API returned ${txResponse.status}`);
       }

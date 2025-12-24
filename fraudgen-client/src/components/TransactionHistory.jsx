@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from "../api";
 
 function TransactionHistory() {
   const [transactions, setTransactions] = useState([]);
@@ -69,7 +69,7 @@ function TransactionHistory() {
 
     console.log('Fetching transactions with params:', queryParams.toString());
 
-    axios.get(`http://localhost:5050/api/transactions?${queryParams.toString()}`)
+    api.get(`/api/transactions?${queryParams.toString()}`)
       .then(response => {
         console.log('API Response:', response.data);
         setTransactions(response.data.transactions || []);
@@ -88,7 +88,7 @@ function TransactionHistory() {
     setLoading(true);
     setError(null);
 
-    axios.get(`http://localhost:5050/api/transactions?limit=1000`)
+    api.get(`/api/transactions?limit=1000`)
       .then(response => {
         const transactions = response.data.transactions || [];
         const transaction = transactions.find(tx => tx.id === parseInt(transactionId));
@@ -122,7 +122,7 @@ function TransactionHistory() {
     
     setLoading(true);
     
-    axios.delete(`http://localhost:5050/api/transactions/${transactionId}`)
+    api.delete(`/api/transactions/${transactionId}`)
       .then(response => {
         console.log('Transaction deleted:', response.data);
         
@@ -188,7 +188,12 @@ function TransactionHistory() {
   // Update transactions when filters change
   useEffect(() => {
     fetchTransactions();
-  }, [filters.offset, filters.limit]);
+  }, [
+  filters.offset,
+  filters.limit,
+  filters.prediction,
+  filters.country
+  ]);
 
   // Handle row click to show transaction details
   const handleRowClick = (transaction) => {

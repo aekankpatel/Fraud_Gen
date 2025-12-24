@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from "../api";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ function Dashboard() {
       return;
     }
     
-    axios.delete(`http://localhost:5050/api/transactions/${transactionId}`)
+    api.delete(`/api/transactions/${transactionId}`)
       .then(response => {
         console.log('Transaction deleted:', response.data);
         
@@ -33,7 +33,7 @@ function Dashboard() {
         alert("Transaction deleted successfully!");
         
         // Refresh statistics to update counts
-        axios.get('http://localhost:5050/api/statistics')
+        api.get('/api/statistics')
           .then(response => {
             console.log('Statistics refreshed successfully');
             setStats(response.data);
@@ -50,7 +50,7 @@ function Dashboard() {
 
   useEffect(() => {
     // Check if API server is available
-    axios.get('http://localhost:5050')
+    api.get('/')
       .then(response => {
         console.log('API server is running:', response.data);
       })
@@ -65,7 +65,7 @@ function Dashboard() {
       });
 
     // Fetch statistics
-    axios.get('http://localhost:5050/api/statistics')
+    api.get('/api/statistics')
       .then(response => {
         console.log('Statistics loaded successfully');
         setStats(response.data);
@@ -86,7 +86,7 @@ function Dashboard() {
       });
 
     // Fetch recent transactions
-    axios.get('http://localhost:5050/api/transactions', {
+    api.get('/api/transactions', {
       params: { limit: 5 }
     })
       .then(response => {
@@ -130,7 +130,7 @@ function Dashboard() {
       <div className="bg-red-50 border border-red-500 text-red-700 p-4 rounded-lg mb-6">
         <h2 className="text-xl font-semibold mb-2">Error</h2>
         <p>{error}</p>
-        <p>Make sure your backend server is running at http://localhost:5050</p>
+        <p>Make sure your backend server is running at </p>
         <div className="mt-4">
           <button 
             onClick={() => window.location.reload()} 
