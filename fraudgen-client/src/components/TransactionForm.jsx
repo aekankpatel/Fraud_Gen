@@ -19,7 +19,7 @@ function TransactionForm() {
   
   const loadSampleTransaction = () => {
     setLoading(true);
-    axios.get('http://localhost:5000/api/test-transaction')
+    axios.get('http://localhost:5050/api/test-transaction')
       .then(response => {
         // Always use step value 3
         const sampleWithTimeStep = {
@@ -47,7 +47,7 @@ function TransactionForm() {
       step: 3
     };
     
-    axios.post('http://localhost:5000/api/predict', submissionData)
+    axios.post('http://localhost:5050/api/predict', submissionData)
       .then(response => {
         setResult(response.data);
         setLoading(false);
