@@ -1,0 +1,37 @@
+# 6a
+
+# Load the built-in dataset
+data("winnebago")
+
+# Check structure
+str(winnebago)
+
+# Convert to time series (already ts object)
+winnebago
+
+plot(winnebago, main = "Monthly Winnebago RV Sales (1966–1972)",
+     ylab = "Units Sold", xlab = "Year")
+
+# 6b
+log_sales <- log(winnebago)
+plot(log_sales, main = "Log of Monthly Winnebago Sales",
+     ylab = "log(Sales)", xlab = "Year")
+
+# 6c
+
+# Fractional relative change
+frac_change <- diff(winnebago) / winnebago[-length(winnebago)]
+
+# Log difference
+log_diff <- diff(log(winnebago))
+
+# Compare numerically
+head(cbind(frac_change, log_diff))
+
+# Plot
+plot(frac_change, type = "l", col = "blue", lwd = 2,
+     ylab = "Change", xlab = "Time",
+     main = "Fractional vs Log Differences")
+lines(log_diff, col = "red", lwd = 2)
+legend("topleft", legend = c("Fractional Change", "Log Difference"),
+       col = c("blue", "red"), lwd = 2)

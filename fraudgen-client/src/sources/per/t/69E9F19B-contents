@@ -1,0 +1,50 @@
+# Operators in R
+
+## Arithmetic Operator: +, -, *, /, %% (remainder), %/%(quotient), ^ (power)
+a<-7.5
+b<-5
+print(a+b)
+print(a-b)
+print(a*b)
+print(a/b)
+print(a%%b)
+print(a%/%b)
+print(a^b)
+
+c1<-c(8,4,5)
+c2<-c(2,6,4)
+print(c1+c2)
+print(c1-c2)
+print(c1*c2)
+print(c1/c2)
+print(c1%%c2)
+print(c1%/%c2)
+print(c1^c2)
+
+## Relational Operators: <, >, ==, <=, >=, !=, the output is always TRUE or FALSE
+print(a>b)
+print(a<b)
+print(a==b)
+print(a>=b)
+print(a<=b)
+print(a!=b)
+
+print(c1>c2)
+print(c1<c2)
+print(c1==c2)
+print(c1>=c2)
+print(c1<=c2)
+print(c1!=c2)
+
+## Logical Operators: &, |, !, &&, ||
+d<-c(2.5, TRUE, 4+7i)
+d
+e<-c(1.4, TRUE, 6+5i)
+e
+print(d&e)
+print(d&&e)
+print(d|e)
+print(d||e)
+print(d!e)
+
+## Assignment Operator: =, <-, ->, <<-, ->>

@@ -11,3 +11,7 @@ fraudgen-client/build/
 .env
 .DS_Store
 .Rhistory
+.env.local
+Model_executed.ipynb
+PS_*.csv
+fraudgen/__pycache__/

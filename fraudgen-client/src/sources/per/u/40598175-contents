@@ -1,0 +1,69 @@
+#Q2: Simulating R1 series
+set.seed(1)
+n  <- 48
+x  <- arima.sim(model = list(ma = -0.8), n = n)
+
+# Q2a
+r1 <- acf(x, plot = FALSE)$acf[2]
+theta_MOM <- (-1 + sqrt(1 - 4*r1^2)) / (2*r1)
+theta_MOM
+
+#Q2b
+fit_css   <- arima(x, order = c(0,0,1), method = "CSS")
+theta_CSS <- fit_css$coef["ma1"]
+theta_CSS
+
+#Q2c
+fit_mle   <- arima(x, order = c(0,0,1), method = "ML")
+theta_ML  <- fit_mle$coef["ma1"]
+theta_ML
+
+#Q2d
+acf(x, main="Sample ACF of MA(1) series")
+
+#Q2e
+set.seed(1)
+
+B <- 500
+MOM <- CSS <- ML <- rep(0, B)
+
+for (i in 1:B){
+  
+  # Simulate MA(1) with theta = 0.8   →  R uses ma = -0.8
+  x <- arima.sim(model = list(ma = -0.8), n = 48)
+  
+  # MOM
+  r1 <- acf(x, plot = FALSE)$acf[2]
+  disc <- 1 - 4*r1^2
+  if (disc > 0) {
+    MOM[i] <- (-1 + sqrt(disc)) / (2*r1)
+  } else {
+    MOM[i] <- NA
+  }
+  
+  # CSS
+  css_fit <- suppressWarnings(
+    arima(x,
+          order = c(0,0,1),
+          method = "CSS",
+          optim.control = list(maxit = 1000))
+  )
+  CSS[i] <- -css_fit$coef["ma1"]   # sign correction
+  
+  # ML
+  ml_fit <- suppressWarnings(
+    arima(x,
+          order = c(0,0,1),
+          method = "ML",
+          optim.control = list(maxit = 1000))
+  )
+  ML[i] <- -ml_fit$coef["ma1"]     # sign correction
+}
+
+# Means
+c(mean(MOM, na.rm = TRUE),
+  mean(CSS),
+  mean(ML))
+
+#Q2f
+var(ML)

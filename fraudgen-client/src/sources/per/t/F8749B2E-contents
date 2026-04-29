@@ -1,0 +1,14 @@
+# Line Graphs
+v<-c(12,43,51,2,63)
+v
+plot(v)
+plot(v,type="l",col="blue",xlab="Month",ylab="Temperature")
+plot(v,type="o",col="red",xlab="Month",ylab="Temperature")
+
+# Line charts containing multiple lines
+v<-c(12,43,51,2,63)
+w<-c(23,38,57,38,1)
+x<-c(34,58,48,2,49)
+plot(v,type="o",col="blue",xlab="Month",ylab="Temperature")
+lines(w,type="o",col="red")
+lines(x,type="o",col="green")

@@ -320,13 +320,6 @@ function TransactionHistory() {
             >
               Return to Transaction List
             </button>
-            
-            <button 
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-              onClick={(e) => deleteTransaction(selectedTransaction.id, e)}
-            >
-              Delete Transaction
-            </button>
           </div>
         </div>
       )}
@@ -360,7 +353,6 @@ function TransactionHistory() {
                     <th className="py-3 px-4 text-left bg-gray-50 font-semibold text-gray-700 border-b">Result</th>
                     <th className="py-3 px-4 text-left bg-gray-50 font-semibold text-gray-700 border-b">Probability</th>
                     <th className="py-3 px-4 text-left bg-gray-50 font-semibold text-gray-700 border-b">Time</th>
-                    <th className="py-3 px-4 text-left bg-gray-50 font-semibold text-gray-700 border-b">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -412,14 +404,6 @@ function TransactionHistory() {
                           (tx.probability * 100).toFixed(2) + '%' : '0%'}
                       </td>
                       <td className="py-3 px-4 border-b">{formatDate(tx.timestamp)}</td>
-                      <td className="py-3 px-4 border-b">
-                        <button
-                          onClick={(e) => deleteTransaction(tx.id, e)}
-                          className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-xs transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </td>
                     </tr>
                   ))}
                 </tbody>

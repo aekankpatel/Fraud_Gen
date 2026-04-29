@@ -1,0 +1,11 @@
+# Take input from user
+name<-readline(prompt = "Enter your name: ")
+age<-readline(prompt = "Enter your age: ")
+print(paste("Hello!, My name is ", name, "and I am", age, "years old."))
+
+
+# Difference between paste and paste0
+paste("fabas","243","yahoo", sep = "_") # W/o sep there will be space by default
+paste0("fabas","243","yahoo") # space won't be added by default
+
+

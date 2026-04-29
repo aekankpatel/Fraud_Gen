@@ -225,7 +225,6 @@ function Dashboard() {
                     <th className="py-3 px-4 text-left bg-gray-50 font-semibold text-gray-700 border-b">Result</th>
                     <th className="py-3 px-4 text-left bg-gray-50 font-semibold text-gray-700 border-b">Probability</th>
                     <th className="py-3 px-4 text-left bg-gray-50 font-semibold text-gray-700 border-b">Time</th>
-                    <th className="py-3 px-4 text-left bg-gray-50 font-semibold text-gray-700 border-b">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -284,17 +283,9 @@ function Dashboard() {
                             : '0%'}
                         </td>
                         <td className="py-3 px-4 border-b">
-                          {tx.timestamp 
-                            ? new Date(tx.timestamp).toLocaleString() 
+                          {tx.timestamp
+                            ? new Date(tx.timestamp).toLocaleString()
                             : 'Unknown'}
-                        </td>
-                        <td className="py-3 px-4 border-b">
-                          <button
-                            onClick={(e) => deleteTransaction(tx.id, e)}
-                            className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-xs transition-colors"
-                          >
-                            Delete
-                          </button>
                         </td>
                       </tr>
                     );

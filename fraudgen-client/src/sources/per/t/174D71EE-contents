@@ -1,0 +1,82 @@
+---
+title: "Q3"
+author: "Aekank Patel"
+output: pdf_document
+---
+
+# Q3: Simulating AR(2) series
+```{r}
+set.seed(1)
+n  <- 60
+x  <- arima.sim(model = list(ar = c(0.6, 0.3)), n = n)
+```
+
+# Q3a: MoM
+```{r}
+acf_vals <- acf(x, plot = FALSE)$acf
+r1 <- acf_vals[2]
+r2 <- acf_vals[3]
+
+phi2_MOM <- (r2 - r1^2) / (1 - r1^2)
+phi1_MOM <- r1 - r1 * phi2_MOM
+c(phi1_MOM, phi2_MOM)
+```
+
+# Q3b: CSE
+```{r}
+fit_css <- arima(x, order = c(2,0,0), method = "CSS")
+phi_CSS <- fit_css$coef[1:2]     
+phi_CSS
+```
+
+# Q3c: MLE
+```{r}
+fit_ml  <- arima(x, order = c(2,0,0), method = "ML")
+phi_ML  <- fit_ml$coef[1:2]
+phi_ML
+```
+
+# Q3d: Sample ACF plot
+```{r}
+pacf(x, main = "Sample PACF of simulated AR(2) series")
+```
+
+# Q3e: Repeating (a) - (c) 500 times and averaging
+```{r}
+set.seed(1)
+B <- 500
+
+phi1_MOM <- phi2_MOM <- numeric(B)
+phi1_CSS <- phi2_CSS <- numeric(B)
+phi1_ML  <- phi2_ML  <- numeric(B)
+
+for (b in 1:B) {
+  x <- arima.sim(model = list(ar = c(0.6, 0.3)), n = 60)
+  
+  ## MOM (Yule–Walker with r1, r2)
+  acf_vals <- acf(x, plot = FALSE)$acf
+  r1 <- acf_vals[2]; r2 <- acf_vals[3]
+  phi2_MOM[b] <- (r2 - r1^2) / (1 - r1^2)
+  phi1_MOM[b] <- r1 - r1 * phi2_MOM[b]
+  
+  ## CSS
+  css_fit <- suppressWarnings(arima(x, order = c(2,0,0), method = "CSS"))
+  phi1_CSS[b] <- css_fit$coef[1]
+  phi2_CSS[b] <- css_fit$coef[2]
+  
+  ## ML
+  ml_fit <- suppressWarnings(arima(x, order = c(2,0,0), method = "ML"))
+  phi1_ML[b] <- ml_fit$coef[1]
+  phi2_ML[b] <- ml_fit$coef[2]
+}
+
+c(mean(phi1_MOM), mean(phi2_MOM))
+c(mean(phi1_CSS), mean(phi2_CSS))
+c(mean(phi1_ML),  mean(phi2_ML))
+```
+
+
+# Q3f: Variance of the sampling distribution
+```{r}
+var(phi1_MOM); var(phi2_MOM)
+```

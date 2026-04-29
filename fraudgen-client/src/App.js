@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // useState kept for headerHeight
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Navigation from './components/Navigation';
@@ -12,59 +12,36 @@ import Statistics from './components/Statistics';
 import './index.css';
 
 function App() {
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(0);
-  
-  // Calculate header height on mount and window resize
+
   useEffect(() => {
-    const updateHeaderHeight = () => {
-      const headerElement = document.querySelector('.app-header');
-      if (headerElement) {
-        setHeaderHeight(headerElement.offsetHeight);
-      }
+    const update = () => {
+      const el = document.querySelector('.app-header');
+      if (el) setHeaderHeight(el.offsetHeight);
     };
-    
-    // Initial calculation
-    updateHeaderHeight();
-    
-    // Update on resize
-    window.addEventListener('resize', updateHeaderHeight);
-    
-    // Cleanup
-    return () => {
-      window.removeEventListener('resize', updateHeaderHeight);
-    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
   }, []);
-  
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-  
+
   return (
     <Router>
       <div className="app-container bg-gray-100">
-        {/* Header */}
-        <Header 
-          isMenuOpen={isMenuOpen} 
-          toggleMenu={toggleMenu} 
-          className="app-header"
-        />
-        
-        {/* Main content area with sidebar and routes */}
+        <Header className="app-header" />
+
         <div className="content-wrapper">
-          {/* Sidebar - fixed position with dynamic top position */}
-          <Navigation 
-            isOpen={isMenuOpen} 
-            onToggle={toggleMenu} 
+          <Navigation
+            isOpen={sidebarOpen}
+            onToggle={() => setSidebarOpen(o => !o)}
             style={{ top: `${headerHeight}px` }}
             className="app-sidebar"
           />
-          
-          {/* Main content - with appropriate padding and margin */}
-          <main 
+
+          <main
             className="main-content"
-            style={{ 
-              marginLeft: isMenuOpen ? '16rem' : '3rem',
+            style={{
+              marginLeft: sidebarOpen ? '16rem' : '3.5rem',
               marginTop: `${headerHeight}px`,
             }}
           >

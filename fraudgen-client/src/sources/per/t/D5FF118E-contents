@@ -1,0 +1,64 @@
+library(dplyr)
+library(lubridate)
+library(forecast)
+library(ggplot2)
+library(tseries)
+
+# Step 1: Load dataset
+data <- read.csv("hotel_bookings.csv", stringsAsFactors = FALSE)
+
+
+# Step 2: Create proper Date column
+data$arrival_date <- as.Date(
+  paste(data$arrival_date_year,
+        data$arrival_date_month,
+        data$arrival_date_day_of_month),
+  format = "%Y %B %d"
+)
+
+
+# Step 3: Aggregate to MONTHLY data (Seasonal series)
+
+monthly_bookings <- data %>%
+  mutate(month = floor_date(arrival_date, "month")) %>%
+  group_by(month) %>%
+  summarise(bookings = n()) %>%
+  arrange(month)
+
+# Step 4: Convert to time series
+start_year  <- year(min(monthly_bookings$month))
+start_month <- month(min(monthly_bookings$month))
+
+y_seasonal <- ts(monthly_bookings$bookings,
+                 start = c(start_year, start_month),
+                 frequency = 12)
+
+# Step 5: Descriptive analysis
+autoplot(y_seasonal) +
+  labs(title = "Monthly Hotel Bookings",
+       x = "Time",
+       y = "Number of Bookings") +
+  theme_minimal()
+
+summary(y_seasonal)
+
+ggseasonplot(y_seasonal) + theme_minimal()
+ggsubseriesplot(y_seasonal) + theme_minimal()
+
+# Step 6: Stationarity check
+adf.test(y_seasonal)
+
+
+# Step 7: Fit SARIMA model
+fit_sarima <- auto.arima(y_seasonal, seasonal = TRUE)
+summary(fit_sarima)
+
+# Step 8: Residual diagnostics
+checkresiduals(fit_sarima)
+
+# Step 9: Forecasting
+fc <- forecast(fit_sarima, h = 12)
+
+autoplot(fc) +
+  labs(title = "12-Month Forecast of Hotel Bookings") +
+  theme_minimal()

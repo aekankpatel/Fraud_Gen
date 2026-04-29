@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from "../api";
+import CountryCombobox from "./CountryCombobox";
 
 function TransactionForm() {
   const [formData, setFormData] = useState({
@@ -16,6 +17,22 @@ function TransactionForm() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [userCoords, setUserCoords] = useState(null);
+  const [locationStatus, setLocationStatus] = useState('pending'); // pending | granted | denied
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setLocationStatus('denied');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserCoords({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
+        setLocationStatus('granted');
+      },
+      () => setLocationStatus('denied')
+    );
+  }, []);
   
   const loadSampleTransaction = () => {
     setLoading(true);
@@ -41,10 +58,13 @@ function TransactionForm() {
     setResult(null);
     setError(null);
     
-    // Ensure step is always 3
     const submissionData = {
       ...formData,
-      step: 3
+      step: 3,
+      ...(userCoords && {
+        user_latitude: userCoords.latitude,
+        user_longitude: userCoords.longitude
+      })
     };
     
     api.post('/api/predict', submissionData)
@@ -210,33 +230,26 @@ function TransactionForm() {
             
             <div className="mb-4">
               <label htmlFor="receiver_country" className="block mb-1.5 font-medium">Receiver Country</label>
-              <select
+              <CountryCombobox
                 id="receiver_country"
-                name="receiver_country"
                 value={formData.receiver_country}
-                onChange={handleChange}
+                onChange={(code) => setFormData(prev => ({ ...prev, receiver_country: code }))}
                 required
-                className="w-full p-2.5 border border-gray-300 rounded h-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="US">United States</option>
-                <option value="CA">Canada</option>
-                <option value="GB">United Kingdom</option>
-                <option value="FR">France</option>
-                <option value="DE">Germany</option>
-                <option value="JP">Japan</option>
-                <option value="CN">China</option>
-                <option value="AU">Australia</option>
-                <option value="IN">India</option>
-                <option value="BR">Brazil</option>
-                <option value="MX">Mexico</option>
-                <option value="RU">Russia</option>
-              </select>
+              />
             </div>
             
             {/* Time Step field is hidden from the UI but still in the formData with fixed value 3 */}
             
             <div className="mt-4 mb-4 p-3 bg-blue-50 rounded text-sm">
-              <p><strong>Note:</strong> Your current location is detected as Jersey City, New Jersey, US. Cross-country transactions may have different risk profiles.</p>
+              {locationStatus === 'pending' && (
+                <p><strong>Location:</strong> Requesting your location...</p>
+              )}
+              {locationStatus === 'granted' && userCoords && (
+                <p><strong>Location:</strong> Using your actual location ({userCoords.latitude.toFixed(4)}, {userCoords.longitude.toFixed(4)}). Cross-country transactions may have different risk profiles.</p>
+              )}
+              {locationStatus === 'denied' && (
+                <p><strong>Location:</strong> Permission denied — defaulting to Jersey City, NJ, US. Cross-country transactions may have different risk profiles.</p>
+              )}
             </div>
             
             <button 

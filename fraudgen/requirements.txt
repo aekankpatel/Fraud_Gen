@@ -4,8 +4,10 @@ gunicorn
 
 numpy
 pandas
-scikit-learn
+xgboost
 joblib
+imbalanced-learn
 
 requests
 python-dotenv
+ipinfo

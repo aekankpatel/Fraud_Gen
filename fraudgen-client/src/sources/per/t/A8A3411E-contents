@@ -1,0 +1,103 @@
+---
+title: "Lecture_1"
+author: "Cheng"
+date: "09/05/2022"
+output: pdf_document
+---
+Learning objectives:
+  1. Basic command in R
+    1.1 assign operator, display results in memory
+    1.2 Environment management
+    1.3 other useful commands
+    
+  2. Data types
+    2.1 Atomic data types
+    2.2 Data types conversions
+  
+#1. Basic command in R
+##1.1 assign operator, display results in memory
+
+```{r}
+# say hello to R!
+```
+
+```{r}
+test <- 'Hello world'
+test
+x <- 2 # keyboard shortcut of <- is alt + -
+x <- 2 + 4 # the previous value is erased
+xx <- rnorm(1) # generates a normal random variate N(0,1)
+10*3 #  not stored in memory
+```
+
+##1.2 Environment management
+
+```{r}
+ls() # list names of objects
+ls.str() # display details charac
+ls(pat="x") # objects containing a given character in their name
+rm(xx) # remove values
+remove(xx) # remove values
+rm(list = ls()) # remove all values
+```
+
+##1.3 other useful commands
+
+```{r}
+?lm # online help for function lm()
+cat("\014") # clear console. same as ctrl+L
+save(x, file="x.Rdata")# save objects to file "x.Rdata"
+```
+
+#2. Data types
+##2.1 Atomic data types
+
+```{r}
+# character 
+a<- 'data'
+mode(a) # data type
+length(a)
+a
+
+# numeric
+b <- 1:10
+mode(b) # numeric class is a more general class than the integer class
+
+# logic
+c <- TRUE
+mode(c)
+d <- F
+mode(d)
+
+# be careful
+combination1 <- c(1, 'a', FALSE) # If you combine char with other type into one vector, the values are all treated like char
+mode(combination1)
+
+combination2 <- c(1.5, FALSE)# If you combine numeric and logical, the logical will become numbers (T to 1, F to 0)
+mode(combination2)
+```
+
+##2.2 Data types conversions
+
+```{r}
+char1 <- "10"
+char1 <- as.numeric(char1) # using as
+mode(char1) <-"character" # using mode
+
+# be careful
+num1= 20
+as.character(num1)
+mode(num1)
+
+# conversion of logical data
+char2 <- "True"
+as.logical(char2)
+char3 <- "1"
+as.logical(char3)
+as.logical(num1)
+as.logical(as.numeric(char3))
+
+# check data type
+is.na(char3) # Check NA value
+is.numeric(2)# is.xx check mode
+```

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LocationMap from './LocationMap';
+import api from '../api';
 
 function LocationDashboard() {
   const navigate = useNavigate();
@@ -15,41 +16,24 @@ function LocationDashboard() {
     const fetchLocationData = async () => {
       setLoading(true);
       try {
-        // Fetch location statistics
-        const statsResponse = await fetch('/api/statistics/locations');
-        if (!statsResponse.ok) {
-          throw new Error(`Statistics API returned ${statsResponse.status}`);
-        }
-        const statsData = await statsResponse.json();
-        setCountryStats(statsData.country_statistics || []);
-        setVpnProxyStats(statsData.vpn_proxy_statistics || []);
-        
-        // Fetch transactions with location data
-        const txQuery = selectedCountry !== 'all' ? `?country=${selectedCountry}&limit=10` : '?limit=10';
-        const txResponse = await fetch(`/api/transactions${txQuery}`);
-        if (!txResponse.ok) {
-          throw new Error(`Transactions API returned ${txResponse.status}`);
-        }
-        const txData = await txResponse.json();
-        
-        // Set default values for missing data
-        const processedTransactions = (txData.transactions || []).map(tx => ({
+        const statsRes = await api.get('/api/statistics/locations');
+        setCountryStats(statsRes.data.country_statistics || []);
+        setVpnProxyStats(statsRes.data.vpn_proxy_statistics || []);
+
+        const txParams = selectedCountry !== 'all'
+          ? { country: selectedCountry, limit: 10 }
+          : { limit: 10 };
+        const txRes = await api.get('/api/transactions', { params: txParams });
+
+        const processedTransactions = (txRes.data.transactions || []).map(tx => ({
           ...tx,
-          transaction_data: tx.transaction_data || {
-            type: 'Unknown',
-            amount: 0
-          },
+          transaction_data: tx.transaction_data || { type: 'Unknown', amount: 0 },
           location_data: tx.location_data || {
-            country: 'Unknown',
-            city: 'Unknown',
-            region: 'Unknown',
-            latitude: 0,
-            longitude: 0,
-            is_vpn: false,
-            is_proxy: false
+            country: 'Unknown', city: 'Unknown', region: 'Unknown',
+            latitude: 0, longitude: 0, is_vpn: false, is_proxy: false
           }
         }));
-        
+
         setLocationTransactions(processedTransactions);
         setLoading(false);
       } catch (err) {
@@ -73,41 +57,24 @@ function LocationDashboard() {
   const handleRefresh = async () => {
     setLoading(true);
     try {
-      // Fetch location statistics
-      const statsResponse = await fetch('/api/statistics/locations');
-      if (!statsResponse.ok) {
-        throw new Error(`Statistics API returned ${statsResponse.status}`);
-      }
-      const statsData = await statsResponse.json();
-      setCountryStats(statsData.country_statistics || []);
-      setVpnProxyStats(statsData.vpn_proxy_statistics || []);
-      
-      // Fetch transactions with location data
-      const txQuery = selectedCountry !== 'all' ? `?country=${selectedCountry}&limit=10` : '?limit=10';
-      const txResponse = await fetch(`/api/transactions${txQuery}`);
-      if (!txResponse.ok) {
-        throw new Error(`Transactions API returned ${txResponse.status}`);
-      }
-      const txData = await txResponse.json();
-      
-      // Set default values for missing data
-      const processedTransactions = (txData.transactions || []).map(tx => ({
+      const statsRes = await api.get('/api/statistics/locations');
+      setCountryStats(statsRes.data.country_statistics || []);
+      setVpnProxyStats(statsRes.data.vpn_proxy_statistics || []);
+
+      const txParams = selectedCountry !== 'all'
+        ? { country: selectedCountry, limit: 10 }
+        : { limit: 10 };
+      const txRes = await api.get('/api/transactions', { params: txParams });
+
+      const processedTransactions = (txRes.data.transactions || []).map(tx => ({
         ...tx,
-        transaction_data: tx.transaction_data || {
-          type: 'Unknown',
-          amount: 0
-        },
+        transaction_data: tx.transaction_data || { type: 'Unknown', amount: 0 },
         location_data: tx.location_data || {
-          country: 'Unknown',
-          city: 'Unknown',
-          region: 'Unknown',
-          latitude: 0,
-          longitude: 0,
-          is_vpn: false,
-          is_proxy: false
+          country: 'Unknown', city: 'Unknown', region: 'Unknown',
+          latitude: 0, longitude: 0, is_vpn: false, is_proxy: false
         }
       }));
-      
+
       setLocationTransactions(processedTransactions);
       setLoading(false);
     } catch (err) {

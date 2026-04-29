@@ -1,0 +1,192 @@
+---
+title: "HW 5 - MA 641"
+author: "Aekank Patel"
+date: "2025-10-30"
+output: pdf_document
+---
+
+# 6a
+```{r}
+phi1 <- 0.7; phi2 <- -0.4; max.lag <- 20
+rho <- numeric(max.lag + 1)
+rho[1] <- phi1 / (1 - phi2)
+rho[2] <- phi1 * rho[1] + phi2
+for (k in 3:(max.lag + 1)) rho[k] <- phi1*rho[k-1] + phi2*rho[k-2]
+rho <- c(1, rho[1:max.lag])   # include rho0
+
+# Print values
+for (k in 0:max.lag) cat(sprintf("rho[%2d] = %.4f\n", k, rho[k+1]))
+
+# Plot theoretical ACF
+plot(0:max.lag, rho, type="h", lwd=2, col="blue",
+     main="Theoretical ACF for AR(2): phi1=0.7, phi2=-0.4",
+     xlab="Lag (k)", ylab=expression(rho[k]))
+abline(h=0, lty=2)
+```
+
+# 6b
+```{r}
+set.seed(42)
+n <- 72
+x <- arima.sim(model = list(ar = c(0.7, -0.4)), n = n)
+
+# Print sample ACF values up to lag 20
+rk <- acf(x, lag.max = 20, plot = FALSE)$acf
+for (k in 0:20) cat(sprintf("r[%2d] = %.4f\n", k, rk[k+1]))
+
+# Plot sample ACF with 95% bands
+acf(x, lag.max = 20, main="(b) Sample ACF (n=72)")
+abline(h = c(-1.96/sqrt(n), 1.96/sqrt(n)), lty = 2)
+```
+
+# 6c
+```{r}
+rho1 <- 0.5; rho2 <- -0.05
+phi11 <- rho1
+phi22 <- (rho2 - rho1^2)/(1 - rho1^2)
+cat(sprintf("phi_11=%.4f\nphi_22=%.4f\nphi_kk=0 for k>=3\n", phi11, phi22))
+pacf.theory <- c(1, phi11, phi22, rep(0, 18))
+plot(0:20, pacf.theory, type="h", lwd=2,
+     main="Theoretical PACF: AR(2)",
+     xlab="Lag", ylab=expression(phi[kk]))
+abline(h=0, lty=2)
+```
+
+# 6d
+```{r}
+phik <- pacf(x, lag.max=20, plot=FALSE)$acf
+cat(sprintf("phihat[%2d]=%.8f\n", 1:20, phik))
+pacf(x, lag.max=20, main="Sample PACF (n=72)")
+```
+
+# 7a
+```{r}
+theta1 <- 0.7; theta2 <- -0.4
+D <- 1 + theta1^2 + theta2^2
+rho <- c(1, theta1*(1+theta2)/D, theta2/D, rep(0, 17))
+for(k in 0:10) cat(sprintf("rho[%2d] = %.6f\n", k, rho[k+1]))
+plot(0:20, rho[1:21], type="h", lwd=2, main="Theoretical ACF (MA(2))",
+     xlab="Lag", ylab=expression(rho[k])); abline(h=0, lty=2)
+```
+
+# 7b
+```{r}
+set.seed(123)
+n <- 36
+x <- arima.sim(model = list(ma = c(0.7, -0.4)), n = n)
+rk <- acf(x, lag.max = 20, plot = FALSE)$acf
+for(k in 0:10) cat(sprintf("r[%2d] = %.6f\n", k, rk[k+1]))
+acf(x, lag.max = 20, main="Sample ACF (n=36)")
+abline(h = c(-1.96/sqrt(n), 1.96/sqrt(n)), lty = 2)
+```
+
+# 7c
+```{r}
+# Build theoretical acf up to L using ARMAacf
+L <- 20
+r <- ARMAacf(ar = NULL, ma = c(0.7, -0.4), lag.max = L)  # r[1]=rho0=1
+# Durbin–Levinson to get theoretical PACF
+pacf.theory <- numeric(L); v <- 1
+phi <- matrix(0, L, L)
+for(k in 1:L){
+  if(k == 1){
+    phi[k,k] <- r[2]     # rho1
+  } else {
+    num <- r[k+1] - sum(phi[k-1,1:(k-1)] * rev(r[2:k]))
+    phi[k,k] <- num / v
+    for(j in 1:(k-1)) phi[k,j] <- phi[k-1,j] - phi[k,k]*phi[k-1,k-j]
+  }
+  v <- v * (1 - phi[k,k]^2)
+  pacf.theory[k] <- phi[k,k]
+}
+for(k in 1:10) cat(sprintf("phi_theory[%2d] = %.6f\n", k, pacf.theory[k]))
+plot(1:L, pacf.theory, type="h", lwd=2, main="Theoretical PACF (MA(2))",
+     xlab="Lag", ylab=expression(phi[kk])); abline(h=0, lty=2)
+```
+
+# 7d
+```{r}
+phik <- pacf(x, lag.max = 20, plot = FALSE)$acf
+for(k in 1:10) cat(sprintf("phihat[%2d] = %.6f\n", k, phik[k]))
+pacf(x, lag.max = 20, main="Sample PACF (n=36)")
+abline(h = c(-1.96/sqrt(n), 1.96/sqrt(n)), lty = 2)
+```
+
+# 8a
+```{r}
+library(urca)
+library(forecast)
+set.seed(123)
+n <- 60
+y <- arima.sim(model = list(order = c(0,1,1), ma = 0.8), n = n)
+
+# Dickey–Fuller (no augmentation)
+df0 <- ur.df(y, type = "none", lags = 0)
+summary(df0)
+```
+
+# 8b
+```{r}
+adf_auto <- ur.df(y, type = "none", selectlags = "AIC")  # AIC chooses best k
+summary(adf_auto)
+```
+
+# 8c
+```{r}
+dy <- diff(y)
+
+# DF on differenced data (k = 0)
+df0_dy <- ur.df(dy, type = "none", lags = 0)
+summary(df0_dy)
+
+# ADF on differenced data (k chosen by AIC)
+adf_auto_dy <- ur.df(dy, type = "none", selectlags = "AIC")
+summary(adf_auto_dy)
+```
+
+# 9a
+```{r}
+library(TSA)
+data(robot)
+
+cat("Length of series:", length(robot), "\n")
+
+# Plot the time series
+plot(robot, type = "l", main = "(a) Robot Time Series",
+     ylab = "Distance (inches)", xlab = "Observation Index")
+abline(h = mean(robot), col = "red", lty = 2)
+```
+
+# 9b
+```{r}
+acf_vals <- acf(robot, lag.max = 20, plot = FALSE)$acf
+pacf_vals <- pacf(robot, lag.max = 20, plot = FALSE)$acf
+
+# Print first few values
+cat("Sample ACF values:\n")
+for (k in 0:10) cat(sprintf("r[%2d] = %.4f\n", k, acf_vals[k+1]))
+
+cat("\nSample PACF values:\n")
+for (k in 1:10) cat(sprintf("phi[%2d] = %.4f\n", k, pacf_vals[k]))
+
+# Plot
+acf(robot, main="(b) Sample ACF of Robot Data")
+pacf(robot, main="(b) Sample PACF of Robot Data")
+```
+
+# 9c
+```{r}
+eacf_result <- eacf(robot)
+print(eacf_result)
+```
+
+# 9d
+```{r}
+# Best subsets ARMA approach
+best.arima <- armasubsets(y = robot, nar = 5, nma = 5, ar.method = "ols")
+plot(best.arima)
+
+# Also compare using automatic AIC
+auto_fit <- auto.arima(robot, ic = "aic", stepwise = FALSE, approximation = FALSE)
+auto_fit
+```

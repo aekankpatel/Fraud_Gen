@@ -1,0 +1,197 @@
+# Assignment 1 (FE 513)
+
+# 1. Part I
+
+# 1.1 Vector
+
+# Q1. Create 2 vectors, each containing 10 random numbers.
+v1 <- runif(10)
+v1
+v2 <- runif(10)
+v2
+
+# Q2. Append the second vector to the first one.
+combined <- c(v1, v2)
+combined
+
+# Q3. Calculate the mean of the new combined vector.
+mean_val <- mean(combined)
+mean_val
+
+# Q4. For each number in the new combined vector, if it is larger than the mean
+#then print out a ’True’, otherwise print out a ’False’.
+result <- combined > mean_val
+result
+
+
+# 1.2 Matrix
+
+# Q1. Create a vector with 100 random numbers.
+vec <- runif(100)
+vec
+
+# Q2. Transfer the above vector into a 10 by 10 matrix M.
+M <- matrix(vec, nrow = 10, ncol = 10)
+M
+
+# Q3. Find the transposed matrix M T . Print the value of element who is in the
+#second row and the first column of M T.
+M_T <- t(M)
+M_T
+print(paste("Element (2,1) of M^T:", M_T[2,1]))
+
+# Q4. Write a nested loop to calculate the inner product between M T and M.
+#The result is also a matrix N= ⟨M T , M ⟩.
+N_manual <- matrix(0, nrow = ncol(M_T), ncol = ncol(M))  # initialize result
+for (i in 1:nrow(M_T)) {
+  for (j in 1:ncol(M)) {
+    sum_val <- 0
+    for (k in 1:ncol(M_T)) {
+      sum_val <- sum_val + M_T[i,k] * M[k,j]
+    }
+    N_manual[i,j] <- sum_val
+  }
+}
+
+# Print result of nested loop
+print("Inner product (manual calculation):")
+print(N_manual)
+
+# Q5. Calculate the same inner product using operator %∗%. And compare two
+#results.
+N_operator <- M_T %*% M
+print("Inner product using %*% operator:")
+print(N_operator)
+
+# Compare the two results
+print(all.equal(N_manual, N_operator))
+
+
+# 1.3 Function
+
+# Q1. Load the given CSV file in R.
+data <- read.csv("stock_data-1.csv", header = TRUE)
+
+# Q2. Delete the columns containing NA(empty values).
+data <- data[, colSums(is.na(data)) == 0]
+
+# Q3. Calculate daily log return for each stock.
+log_returns <- apply(data[,-1], 2, function(x) diff(log(x)))
+summary(log_returns)
+
+# Q4. Calculate the mean and standard deviation of log return for each stock.
+#Transfer the result into a 2 by N data frame.
+stats <- rbind(
+  mean = apply(log_returns, 2, mean, na.rm = TRUE),
+  sd   = apply(log_returns, 2, sd, na.rm = TRUE)
+)
+stats
+
+# Q5. Build a graph with two sub-plots. In the first sub-plot, plot the first three
+#stocks’ daily prices. The y axis is stock price and x axis is date. In the
+#second sub-plot, build a scatter plot of the statistical result you calculated
+#above. In other words, the x-axis is the stocks’ names and the y-axis is
+#the statistical values.
+par(mfrow = c(1, 2))
+
+# Convert first column to Date
+data[,1] <- as.Date(data[,1])
+
+# First subplot: first three stocks daily prices
+matplot(data[,1], data[,2:4], type = "l", lty = 1, col = 1:3,
+        xlab = "Date", ylab = "Stock Price", main = "Daily Prices")
+legend("topleft", legend = colnames(data)[2:4], col = 1:3, lty = 1)
+
+# Second subplot: scatter plot of mean & sd
+barplot(stats, beside = TRUE, names.arg = colnames(log_returns),
+        col = c("skyblue", "orange"), main = "Mean & SD of Log Returns",
+        ylab = "Values")
+legend("topright", legend = rownames(stats), fill = c("skyblue", "orange"))
+
+
+# BONUS: Do problems in section 1.3 again using ’pipe’.
+
+# Q1. Load the given CSV file in R.
+# and
+# Q2. Delete the columns containing NA(empty values).
+data <- read.csv("stock_data-1.csv", header = TRUE) |>
+  (\(df) df[, colSums(is.na(df)) == 0])()
+
+# Q3. Calculate daily log return for each stock.
+log_returns <- data[,-1] |>
+  (\(df) apply(df, 2, function(x) diff(log(x))))()
+summary(log_returns)
+
+# Q4. Calculate the mean and standard deviation of log return for each stock.
+#Transfer the result into a 2 by N data frame (N is the number of stocks).
+stats <- log_returns |>
+  (\(lr) rbind(
+    mean = apply(lr, 2, mean, na.rm = TRUE),
+    sd   = apply(lr, 2, sd, na.rm = TRUE)
+  ))()
+stats
+
+# Q5. Build a graph with two sub-plots. In the first sub-plot, plot the first three
+#stocks’ daily prices. The y axis is stock price and x axis is date. In the
+#second sub-plot, build a scatter plot of the statistical result you calculated
+#above. In other words, the x-axis is the stocks’ names and the y-axis is
+#the statistical values.
+par(mfrow = c(1, 2))
+
+# Convert first column to Date
+data[,1] <- as.Date(data[,1])
+
+# First subplot: first three stocks daily prices
+matplot(data[,1], data[,2:4], type = "l", lty = 1, col = 1:3,
+        xlab = "Date", ylab = "Stock Price", main = "Daily Prices")
+legend("topleft", legend = colnames(data)[2:4], col = 1:3, lty = 1)
+
+# Second subplot: scatter plot of mean & sd
+barplot(stats, beside = TRUE, names.arg = colnames(log_returns),
+        col = c("skyblue", "orange"), main = "Mean & SD of Log Returns",
+        ylab = "Values")
+legend("topright", legend = rownames(stats), fill = c("skyblue", "orange"))
+
+
+# 2. Part 2: Try to use package ‘quantmod’ to download data, and search functions in ‘quant-
+#mod’ package to do following tasks.
+
+# Load required packages
+library(quantmod)
+library(xts)
+
+# Q1. Download Amazon daily stock price data from 2021-01-01 to 2021-12-31.
+#And save the data to a csv file.
+getSymbols("AMZN", from = "2021-01-01", to = "2021-12-31", auto.assign = TRUE)
+write.csv(AMZN, "AMZN_2021.csv", row.names = TRUE)
+
+# Q2. Calculate weekly log returns based on adjusted close price.
+adj_close <- AMZN$AMZN.Adjusted
+weekly_prices <- period.apply(adj_close, INDEX = endpoints(adj_close, on = "weeks"), FUN = last)
+weekly_prices
+weekly_log_returns <- diff(log(weekly_prices))
+weekly_log_returns
+
+# Q3. Calculate median, mean, standard deviation of log returns.
+median_return <- median(weekly_log_returns, na.rm = TRUE)
+median_return
+mean_return <- mean(weekly_log_returns, na.rm = TRUE)
+mean_return
+sd_return <- sd(weekly_log_returns, na.rm = TRUE)
+sd_return
+
+# Q4. Plot the distribution of stock daily log returns.
+adj_close <- AMZN$AMZN.Adjusted
+daily_log_returns <- diff(log(adj_close))
+hist(daily_log_returns, breaks = 20,
+     main = "AMZN Daily Log Returns",
+     xlab = "Log Return", col = "lightgray", border = "black")
+
+# Q5. Count how many observation in this series whose log return is between
+#0.01 and 0.015.
+
+# Weekly
+sum(weekly_log_returns > 0.01 & weekly_log_returns < 0.015, na.rm = TRUE)
+
+# Daily
+sum(daily_log_returns > 0.01 & daily_log_returns < 0.015, na.rm = TRUE)

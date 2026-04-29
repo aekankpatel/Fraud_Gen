@@ -1,0 +1,43 @@
+theta1 <- 0.7; theta2 <- -0.4
+D <- 1 + theta1^2 + theta2^2
+rho <- c(1, theta1*(1+theta2)/D, theta2/D, rep(0, 17))
+for(k in 0:10) cat(sprintf("rho[%2d] = %.6f\n", k, rho[k+1]))
+plot(0:20, rho[1:21], type="h", lwd=2, main="Theoretical ACF (MA(2))",
+     xlab="Lag", ylab=expression(rho[k])); abline(h=0, lty=2)
+
+#7b
+set.seed(123)
+n <- 36
+x <- arima.sim(model = list(ma = c(0.7, -0.4)), n = n)
+rk <- acf(x, lag.max = 20, plot = FALSE)$acf
+for(k in 0:10) cat(sprintf("r[%2d] = %.6f\n", k, rk[k+1]))
+acf(x, lag.max = 20, main="Sample ACF (n=36)")
+abline(h = c(-1.96/sqrt(n), 1.96/sqrt(n)), lty = 2)
+
+#7c
+# Build theoretical acf up to L using ARMAacf
+L <- 20
+r <- ARMAacf(ar = NULL, ma = c(0.7, -0.4), lag.max = L)  # r[1]=rho0=1
+# Durbin–Levinson to get theoretical PACF
+pacf.theory <- numeric(L); v <- 1
+phi <- matrix(0, L, L)
+for(k in 1:L){
+  if(k == 1){
+    phi[k,k] <- r[2]     # rho1
+  } else {
+    num <- r[k+1] - sum(phi[k-1,1:(k-1)] * rev(r[2:k]))
+    phi[k,k] <- num / v
+    for(j in 1:(k-1)) phi[k,j] <- phi[k-1,j] - phi[k,k]*phi[k-1,k-j]
+  }
+  v <- v * (1 - phi[k,k]^2)
+  pacf.theory[k] <- phi[k,k]
+}
+for(k in 1:10) cat(sprintf("phi_theory[%2d] = %.6f\n", k, pacf.theory[k]))
+plot(1:L, pacf.theory, type="h", lwd=2, main="Theoretical PACF (MA(2))",
+     xlab="Lag", ylab=expression(phi[kk])); abline(h=0, lty=2)
+
+#7d
+phik <- pacf(x, lag.max = 20, plot = FALSE)$acf
+for(k in 1:10) cat(sprintf("phihat[%2d] = %.6f\n", k, phik[k]))
+pacf(x, lag.max = 20, main="Sample PACF (n=36)")
+abline(h = c(-1.96/sqrt(n), 1.96/sqrt(n)), lty = 2)

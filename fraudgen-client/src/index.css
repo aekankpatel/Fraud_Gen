@@ -2,29 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom scrollbar for webkit browsers */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1e293b; /* slate-800 */
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #475569; /* slate-600 */
+  background: #94a3b8;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #64748b; /* slate-500 */
+  background: #64748b;
 }
 
-/* For Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #475569 #1e293b;
+  scrollbar-color: #94a3b8 #f1f5f9;
 }
 
 body {
@@ -81,21 +80,3 @@ body {
   position: relative;
 }
 
-/* Custom scrollbar for better user experience */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}

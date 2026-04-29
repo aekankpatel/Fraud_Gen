@@ -1,0 +1,8 @@
+# Histogram
+v<-c(12,35,63,23,87,56,38,93,43,63)
+v
+
+hist(v,xlab="weight",ylab="frequency",col = "green",border="red")
+
+# Use of xlim and ylim parameter
+hist(v,xlab="weight",ylab="frequency",col = "green",border="red",xlim = c(0,40),ylim=c(0,3),breaks=3)

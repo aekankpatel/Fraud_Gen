@@ -1,0 +1,22 @@
+# Simulate MA(1)
+set.seed(123)
+n <- 36
+theta <- -0.5
+y <- arima.sim(model = list(ma = theta), n = n)
+
+# (a) Fit MA(1) and plot residuals
+fit <- arima(y, order = c(0, 0, 1))
+res <- residuals(fit)
+
+ts.plot(res, main = "Residuals from MA(1) Fit", ylab = "Residuals")
+abline(h = 0, col = "red")
+
+# (b) Normal Q-Q plot
+qqnorm(res, main = "Normal Q-Q Plot of Standardized Residuals")
+qqline(res, col = "red")
+
+# (c) ACF of residuals
+acf(res, main = "ACF of Residuals")
+
+# (d) Ljung–Box test up to K = 6
+Box.test(res, lag = 6, type = "Ljung-Box")

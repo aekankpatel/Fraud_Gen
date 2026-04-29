@@ -1,0 +1,39 @@
+# R I: Fibonacci numbers
+fib <- function(n) {
+  if (n == 0) {
+    return(0)
+  } else if (n == 1) {
+    return(1)
+  } else {
+    return(fib(n - 1) + fib(n - 2))
+  }
+}
+
+# Test the function:
+fib(11)
+
+
+
+# R II: Sliding Window Average
+maxAverageSubarray <- function(nums, k) {
+  n <- length(nums)
+  
+  # Initial window sum
+  window_sum <- sum(nums[1:k])
+  max_sum <- window_sum
+  
+  # Slide window
+  for (i in (k+1):n) {
+    window_sum <- window_sum - nums[i - k] + nums[i]
+    if (window_sum > max_sum) {
+      max_sum <- window_sum
+    }
+  }
+  
+  return(max_sum / k)
+}
+
+# Test:
+nums <- c(1, 12, -5, -6, 50, 3)
+k <- 4
+maxAverageSubarray(nums, k)

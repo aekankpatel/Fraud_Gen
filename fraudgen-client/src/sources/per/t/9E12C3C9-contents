@@ -1,0 +1,47 @@
+# Complete Factors
+
+# Categorical Variables: A categorical or discrete variables is one that has two or more categories/values
+# There are two types of categorical variables: nominal and ordinal
+# A nominal variable has no intrinsic ordering of its categories. eg gender male or female
+# A ordinal variables has a clear variable. eg low, med, high temp
+
+# Factors:
+# R Factor is used to store categorical data as levels. It can store both character and integer types of data. These factors are created with the help of factor() functions, by taking a vector as input
+# Factors have labels which are associated with unique integers stored in it. It contains predefined set value known as levels and by default R always sorts levels in alphabetical order
+
+# Attributes of a factor
+# X: It is the input vector which is to be transformed into a factor
+# levels: It is an input vector that represents a set of unique values which are taken by X
+# labels: It is a character vector which corresponds to the number of labels
+# exclude: It is used to specify the value which we want to be excluded
+# Ordered: It is a logical attribute which determines if the levels are ordered
+# nmax: It is used to specify the upper bound for the maximum number of level
+
+# R Factor
+
+dir<-c("North","West","East","North")
+is.factor(dir)
+factor(dir)
+
+dir<-c("North","West","East","South")
+is.factor(dir)
+factor(dir)
+factor(dir, levels = c("North","West", "East","South"), labels = c("N","W","E","S"))
+factor(dir, levels = c("North","West", "East","South"), exclude="North")
+
+# gl(), n, k labels
+v1<-gl(3,4,labels=c("ram","mohan","sohan"))
+v1
+dir<-c("North","West","East","North")
+data<-factor(dir)
+data
+data[3]
+data[4]
+data[c(2,4)]
+data[-1]
+data[2]<-"East"
+data
+is.factor(dir)
+is.ordered(dir)
+as.factor(dir)
+as.ordered(dir)

@@ -1,0 +1,76 @@
+# Parameters
+cases <- list(
+  a = c(phi1 = 0.6,  phi2 = 0.3),
+  b = c(phi1 = -0.4, phi2 = 0.5),
+  c = c(phi1 = 1.2,  phi2 = -0.7)
+)
+
+set.seed(641)
+par(mfrow = c(3,2), mar = c(3.5,3.5,2,1))
+for (nm in names(cases)) {
+  p <- cases[[nm]]
+  y <- arima.sim(model = list(ar = c(p["phi1"], p["phi2"])), n = 150, sd = 1)
+  plot.ts(y, main = sprintf("AR(2) series: φ1=%.2f, φ2=%.2f", p["phi1"], p["phi2"]), ylab = "Y_t")
+  acf(y, main = "Sample ACF (n=150)")
+}
+
+
+# ========== AR(2) ACF by recursion ==========
+acf_ar2 <- function(phi1, phi2, lag.max = 20) {
+  rho <- numeric(lag.max + 1)
+  rho[1] <- 1                                   # rho_0
+  rho[2] <- phi1 / (1 - phi2)                   # rho_1
+  for (k in 3:(lag.max + 1)) {
+    rho[k] <- phi1 * rho[k-1] + phi2 * rho[k-2] # recursion
+  }
+  rho
+}
+
+# Parameters
+models <- list(
+  a = c(phi1 = 0.6,  phi2 = 0.3),
+  b = c(phi1 = -0.4, phi2 = 0.5),
+  c = c(phi1 = 1.2,  phi2 = -0.7)
+)
+
+# --- Print first few ACF values ---
+for (nm in names(models)) {
+  p <- models[[nm]]
+  rho <- acf_ar2(p["phi1"], p["phi2"], lag.max = 10)
+  cat(sprintf("\nModel %s (phi1=%.2f, phi2=%.2f):\n", nm, p["phi1"], p["phi2"]))
+  print(round(rho[1:7], 4))   # rho_0...rho_5
+}
+
+# --- Plot theoretical ACFs (barplots) ---
+par(mfrow = c(1,3), mar = c(4,4,2,1))
+for (nm in names(models)) {
+  p <- models[[nm]]
+  rho <- acf_ar2(p["phi1"], p["phi2"], lag.max = 20)
+  barplot(rho[1:12], names.arg = 0:11, ylim = c(-1,1),
+          main = sprintf("Theoretical ACF\nphi1=%.2f, phi2=%.2f", p["phi1"], p["phi2"]),
+          ylab = expression(rho[k]))
+  abline(h=0)
+}
+
+
+# Characteristic roots for AR(2): 1 - phi1*z - phi2*z^2 = 0
+char_roots <- function(phi1, phi2) {
+  roots <- polyroot(c(1, -phi1, -phi2))
+  return(roots)
+}
+
+# Models
+phi_list <- list(
+  a = c(0.6, 0.3),
+  b = c(-0.4, 0.5),
+  c = c(1.2, -0.7)
+)
+
+# Compute and print roots
+for (nm in names(phi_list)) {
+  phi1 <- phi_list[[nm]][1]; phi2 <- phi_list[[nm]][2]
+  cat(sprintf("\nModel %s: phi1=%.2f, phi2=%.2f\n", nm, phi1, phi2))
+  roots <- char_roots(phi1, phi2)
+  cat("Roots:\n"); print(roots)     # print actual roots
+  cat("Moduli of roots:\n"); print(Mod(roots))  # print absolute values
+}

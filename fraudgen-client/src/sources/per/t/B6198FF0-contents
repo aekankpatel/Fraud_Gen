@@ -1,0 +1,47 @@
+# (a) IMA(1,1) 5-step forecast with 95% limits
+library(TSA)
+library(forecast)
+
+data(robot)
+robot_ts <- ts(robot)              # simple ts object
+
+n <- length(robot_ts)
+train <- window(robot_ts, end = n-5)
+test  <- window(robot_ts, start = n-4)  # last 5 points
+
+# IMA(1,1) = ARIMA(0,1,1)
+fit_ima <- Arima(train, order = c(0,1,1))
+fit_ima
+
+# 5-step-ahead forecasts + 95% limits
+fc_ima <- forecast(fit_ima, h = 5, level = 95)
+fc_ima$mean            # point forecasts
+fc_ima$lower[,"95%"]   # lower 95% limits
+fc_ima$upper[,"95%"]   # upper 95% limits
+
+# (b) Plot forecasts, limits, and actual values & interpret
+library(ggplot2)
+autoplot(fc_ima) +
+  autolayer(test, series = "Actual", color = "black") +
+  ggtitle("IMA(1,1) 5-step forecasts for robot data") +
+  xlab("Time") + ylab("Position deviation")
+
+
+# ARMA(1,1) on original series
+fit_arma <- Arima(train, order = c(1,0,1))
+fit_arma
+
+
+# (c) ARMA(1,1) 5-step forecast + comparison with IMA(1,1)
+
+fc_arma <- forecast(fit_arma, h = 5, level = 95)
+
+autoplot(fc_arma) +
+  autolayer(test, series = "Actual", color = "black") +
+  ggtitle("ARMA(1,1) 5-step forecasts for robot data") +
+  xlab("Time") + ylab("Position deviation")
+
+acc_ima  <- accuracy(fc_ima, test)
+acc_arma <- accuracy(fc_arma, test)
+acc_ima
+acc_arma

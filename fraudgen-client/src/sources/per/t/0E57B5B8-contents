@@ -1,0 +1,16 @@
+# Excel file
+
+# Installing xlsx package
+install.packages("xlsx")
+
+# Verifying the packages is installed
+any(grepl("xlsx",installed.packages()))
+
+# Loading the library into R workspace
+library("xlsx")
+
+# Reading the xlsx file
+#read.xlsx(file_name,sheet_index)
+
+# Reading the first worksheet into the file employee.xlsx
+excel_data<-read.xlsx("employee.xlsx", sheetIndex=1)

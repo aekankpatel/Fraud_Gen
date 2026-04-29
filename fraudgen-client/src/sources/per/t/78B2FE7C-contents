@@ -1,0 +1,7 @@
+# 5 b) Simulate MA(4) and plot sample ACF
+theta <- c(0.8, 0.6, 0.4, 0.2)
+y <- arima.sim(model=list(ma=theta), n=150)
+# Compute and plot the sample ACF
+acf_result <- acf(y, main="Sample ACF of Simulated MA(4)")
+# Show numerical autocorrelation values
+print(acf_result)
